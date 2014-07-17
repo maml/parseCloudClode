@@ -4,7 +4,6 @@
   These objects are not associated with any other objects so we just blast'em
   away.
 */
-
 Parse.Cloud.afterSave("SMSCode", function(request) {
   query = new Parse.Query("SMSCode");
   query.get(request.object.get("smsCode").id, {

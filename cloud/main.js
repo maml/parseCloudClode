@@ -1,5 +1,5 @@
 /*
- -------------------------- @Twilio ----------------------------------
+ -------------------------- Twilio ----------------------------------
 */
 
 var twilio = require('cloud/twilio.js');
@@ -7,6 +7,11 @@ var twilio = require('cloud/twilio.js');
 Parse.Cloud.define("sendSMSVerification", function(request, response) {
   twilio.sendSMSVerification(request, response);
 });
+
+/*
+ -------------------------- SMSCode ----------------------------------
+*/
+require('cloud/smsCode.js');
 
 /*
  -------------------------- @Mentions --------------------------------
