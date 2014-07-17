@@ -4,8 +4,8 @@
 
 var twilio = require('cloud/twilio.js');
 
-Parse.Cloud.define("demoSMS", function(request, response) {
-  twilio.demoSMS(request, response);
+Parse.Cloud.define("sendSMSVerification", function(request, response) {
+  twilio.sendSMSVerification(request, response);
 });
 
 /*
