@@ -3,7 +3,7 @@ var message;
 var twilio = require("twilio");
 twilio.initialize("ACe7c2b91203350d82da8e09596e07959d","c77d656ed20c198c5e938a2f46b5037b");
 
-exports.demoSMS = function(request, response) {
+exports.sendSMSVerification = function(request, response) {
   generateCode();
   codeMessage();
   twilio.sendSMS({
