@@ -32,6 +32,7 @@ exports.sendSMSVerification = function(request, response) {
       response.success("SMS sent!");
       var smsCode = new SMSCode();
       smsCode.set("code", code);
+      smsCode.set("phoneNumber", request.params.number);
       smsCode.set("verified", false);
       smsCode.save(null, {
         success: function(smsCode) {
