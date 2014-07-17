@@ -1,5 +1,6 @@
 var code = [];
 var message;
+var phoneNumber;
 var SMSCode = Parse.Object.extend("SMSCode");
 
 var twilio = require("twilio");
@@ -21,18 +22,19 @@ function codeMessage() {
 }
 
 exports.sendSMSVerification = function(request, response) {
+  phoneNumber = request.params.number;
   generateCode();
   codeMessage();
   twilio.sendSMS({
     From: "+17082776170",
-    To: request.params.number,
+    To: phoneNumber,
     Body: message
   }, {
     success: function(httpResponse) {
       response.success("SMS sent!");
       var smsCode = new SMSCode();
       smsCode.set("code", code);
-      smsCode.set("phoneNumber", request.params.number);
+      smsCode.set("phoneNumber", phoneNumber);
       smsCode.set("verified", false);
       smsCode.save(null, {
         success: function(smsCode) {
