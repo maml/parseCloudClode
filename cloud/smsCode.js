@@ -4,7 +4,8 @@
   These objects are not associated with any other objects so we just blast'em
   away.
 */
-Parse.Cloud.afterSave("SMSCode", function(request) {
+
+exports.afterSave = function(request) {
   query = new Parse.Query("SMSCode");
   query.get(request.object.get("smsCode").id, {
     success: function(smsCode) {
@@ -16,4 +17,4 @@ Parse.Cloud.afterSave("SMSCode", function(request) {
       console.error("Got an error " + error.code + " : " + error.message);
     }
   });
-});
+}
