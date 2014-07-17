@@ -6,15 +6,29 @@
 */
 
 exports.afterSave = function(request) {
-  query = new Parse.Query("SMSCode");
-  query.get(request.object.get("smsCode").id, {
-    success: function(smsCode) {
-      if (smsCode.get("verified")) {
-        smsCode.delete();
+
+  var SMSCode = Parse.Object.extend("SMSCode");
+  var query = new Parse.Query(SMSCode);
+
+  query.get(request.object.id, {
+      success: function(smsCode) {
+        if (smsCode.get("verified")) {
+          destroy(smsCode);
+        }
+      },
+      error: function(smsCode, error) {
+        console.error("Error finding " + smsCode + error.code + ": " + error.message);
       }
+  });
+}
+
+function destroy(obj) {
+  obj.destroy({
+    success: function(obj) {
+      console.log("deleted an object");
     },
-    error: function(error) {
-      console.error("Got an error " + error.code + " : " + error.message);
+    error: function(obj, error) {
+      console.error("Error deleting " + obj + error.code + ": " + error.message);
     }
   });
 }
