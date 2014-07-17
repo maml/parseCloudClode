@@ -34,10 +34,8 @@ exports.beforeSave = function(request, response) {
   query.equalTo("phoneNumber", request.object.get("phoneNumber"));
   query.find({
     success: function(smsCodes) {
-      console.log("smsCodes.length is " + smsCodes.length);
       if (smsCodes.length > 0) {
         smsCodes.forEach(function(smsCode) {
-          console.log('here');
           destroy(smsCode);
         });
       }
