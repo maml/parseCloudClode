@@ -33,7 +33,7 @@ exports.sendSMSVerification = function(request, response) {
     success: function(httpResponse) {
       response.success("SMS sent!");
       var smsCode = new SMSCode();
-      smsCode.set("code", code);
+      smsCode.set("verificationCode", code);
       smsCode.set("phoneNumber", phoneNumber);
       smsCode.set("verified", false);
       smsCode.save(null, {
