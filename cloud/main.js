@@ -4,6 +4,9 @@
 var smsCode = require('cloud/smsCode.js');
 Parse.Cloud.afterSave("SMSCode", smsCode.afterSave);
 Parse.Cloud.beforeSave("SMSCode", smsCode.beforeSave);
+Parse.Cloud.define("verifyCode", function(request, response) {
+  smsCode.verifyCode(request, response);
+});
 
 /*
   Twilio

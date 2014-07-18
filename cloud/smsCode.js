@@ -47,6 +47,41 @@ exports.beforeSave = function(request, response) {
   });
 }
 
+exports.verifyCode = function(request, response) {
+
+  var SMSCode = Parse.Object.extend("SMSCode");
+  var query = new Parse.Query(SMSCode);
+
+  query.equalTo("phoneNumber", request.params.phoneNumber);
+  query.equalTo("verificationCode", request.params.verificationCode);
+
+  query.find().then(function(smsCodes){
+
+    /*
+      Once the code's been verified it's no longer needed. It's up to the client application
+      to hold a reference to the phone number, or any other data relating to this instance,
+      if needed.
+    */
+    var promise = Parse.Promise.as();
+    smsCodes.forEach(function(smsCode) {
+      promise = promise.then(function() {
+        return smsCode.destroy();
+      });
+    });
+    return promise;
+
+  }).then(function() {
+
+    response.success("done");
+
+  }, function(error){
+
+    console.log("There was an error querying for the smsCodes: " + error.code + " " + error.message);
+    response.error(error);
+
+  });
+}
+
 /*
   Helpers
 */
