@@ -17,10 +17,18 @@ Parse.Cloud.define("sendSMSVerification", function(request, response) {
 });
 
 /*
-  Mentions
+  Blurbs
 */
-var mentions = require('cloud/mentions.js');
+var blurbs = require('cloud/blurbs.js');
 // AudioClip will be renamed to Blurb, eventually.
 Parse.Cloud.afterSave("AudioClip", function(request, response) {
-  mentions.extractMentions(request, response);
+  blurbs.extractMentions(request, response);
+});
+
+/*
+  Activities
+*/
+var notifications = require('cloud/notifications.js');
+Parse.Cloud.afterSave("Activity", function(request, response) {
+  notifications.notify(request, response);
 });

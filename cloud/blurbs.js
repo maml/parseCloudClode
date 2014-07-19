@@ -1,6 +1,9 @@
 var mentioner;
+var activities = require('cloud/activities.js');
 
 exports.extractMentions = function(request, response) {
+
+  blurb = request.object;
 
   // blurb user's objectId
   var blurbAuthorUserId = request.object.get("user").id;
@@ -15,16 +18,23 @@ exports.extractMentions = function(request, response) {
   });
 
   getBlurbAuthorUserName(blurbAuthorUserId).then(function(user){
-    mentioner = user; // :-/
+    mentioner = user;
     return getMentionedUsers(mentionedUsersNames);
   }).then(function(users){
-    (users.length > 0) ? notify(users) : null;
+    createActivityForMentionsForUsers(users);
   }, function(error){
     console.log("there was an error: " + error.code + " " + error.message);
   });
 }
 
-// so we can have a message that goes like, "@so-and-so mentioned you . . ."
+function createActivityForMentionsForUsers(users)
+{
+  users.forEach(function(user){
+    var params = {"mentioner" : mentioner, "mentionee" : user, "blurb" : blurb};
+    activities.createMention(params);
+  });
+}
+
 function getBlurbAuthorUserName(id) {
   var promise = new Parse.Promise();
   var query = new Parse.Query(Parse.User);
@@ -43,27 +53,4 @@ function getMentionedUsers(mentionedUsersNames) {
     promise.resolve(users);
   });
   return promise;
-}
-
-// notifications should be broken out into their own module
-function notify(users) {
-
-  var message = "@" + mentioner.get("username") + " mentioned you in a blurb."
-
-  var query = new Parse.Query(Parse.Installation);
-  query.containedIn('user', users);
-
-  Parse.Push.send({
-    where: query,
-    data: {
-      alert: message,
-      badge: "Increment",
-      sound: "push-notification.aiff"
-    }
-  }).then(function() {
-    console.log("push was successful");
-  }, function(error) {
-    console.log("there was an error sending the push: " + error.code + " " + error.message);
-  });
-
 }
