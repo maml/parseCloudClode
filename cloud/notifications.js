@@ -2,7 +2,7 @@ var mentioner, mentionee, blurb;
 
 exports.notify = function(request, response) {
   if (request.object.get("type") == "mention") {
-    getNotificationForActivity(request).then(function(result){
+    getNotificationForRequest(request).then(function(result){
       if (!result) {
         return getActivity(request);
       } else {
@@ -14,7 +14,7 @@ exports.notify = function(request, response) {
   }
 
   if (request.object.get("type") == "like") {
-    getNotificationForActivity(request).then(function(result){
+    getNotificationForRequest(request).then(function(result){
       if (!result) {
         return getActivity(request);
       } else {
@@ -26,7 +26,7 @@ exports.notify = function(request, response) {
   }
 
   if (request.object.get("type") == "follow") {
-    getNotificationForActivity(request).then(function(result){
+    getNotificationForRequest(request).then(function(result){
       if (!result) {
         return getActivity(request);
       } else {
@@ -55,16 +55,16 @@ function getActivity(request) {
 
 }
 
-function getNotificationForActivity(activity) {
+function getNotificationForRequest(request) {
 
   var promise = new Parse.Promise();
   var Notification = Parse.Object.extend("Notification");
 
   var query = new Parse.Query(Notification);
-  query.equalTo("fromUser", activity.get("fromUser"));
-  query.equalTo("toUser", activity.get("toUser"));
-  query.equalTo("type", activity.get("type"));
-  query.equalTo("blurb", activity.get("blurb"));
+  query.equalTo("fromUser", request.object.get("fromUser"));
+  query.equalTo("toUser", request.object.get("toUser"));
+  query.equalTo("type", request.object.get("type"));
+  query.equalTo("blurb", request.object.get("blurb"));
 
   query.first({
     success: function(object) {
