@@ -22,6 +22,7 @@ function getActivity(request) {
   var query = new Parse.Query(Activity);
   query.include("fromUser");
   query.include("toUser");
+  (request.object.get("type") == "like") ? query.include("blurb") : null;
 
   query.get(request.object.id).then(function(activity){
     promise.resolve(activity);
