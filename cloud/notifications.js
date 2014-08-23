@@ -54,6 +54,7 @@ function pushFollow(activity, response) {
       badge: "Increment",
       sound: "push-notification.aiff"
     }
+    recordNotificationForActivity(activity);
   }, function(error) {
     console.log("there was an error sending the push: " + error.code + " " + error.message);
   });
@@ -78,6 +79,7 @@ function pushLike(activity, response) {
       badge: "Increment",
       sound: "push-notification.aiff"
     }
+    recordNotificationForActivity(activity);
   }, function(error) {
     console.log("there was an error sending the push: " + error.code + " " + error.message);
   });
@@ -100,7 +102,27 @@ function pushMention(activity, response) {
       badge: "Increment",
       sound: "push-notification.aiff"
     }
+    recordNotificationForActivity(activity);
   }, function(error) {
     console.log("there was an error sending the push: " + error.code + " " + error.message);
   });
+}
+
+function recordNotificationForActivity(activity) {
+    var Notification = Parse.Object.extend("Notification");
+    var notification = new Notification();
+    notification.set("type", activity.get("type"));
+    notification.set("fromUser", activity.get("fromUser"));
+    notification.set("toUser", activity.get("toUser"));
+    notification.set("blurb", activity.get("blurb"));
+    notification.save(null, {
+      success: function(activity) {
+        console.log("Notification has been created with objectId: " + notification.id);
+      },
+      error: function(activity, error) {
+        console.log("Failed to create new activity, with error: " + error.message);
+      }
+    });
+  }
+
 }
