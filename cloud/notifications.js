@@ -6,6 +6,12 @@ exports.notify = function(request, response) {
       pushMention(activity, response);
     });
   }
+
+  if (request.object.get("type") == "like") {
+    getActivity(request).then(function(activity){
+      pushLike(activity, response);
+    });
+  }
 }
 
 function getActivity(request) {
@@ -22,6 +28,29 @@ function getActivity(request) {
   });
   return promise;
 
+}
+
+function pushLike(activity, response) {
+
+  liker = activity.get("fromUser");
+  likee = activity.get("toUser");
+  blurb = activity.get("blurb");
+
+  var message = "@" + liker.get("username") + " liked your blurb, " + blurb.get("title");
+
+  var query = new Parse.query(Parse.Installation);
+  query.equalTo("user", likee);
+
+  Parse.Push.send({
+    where: query,
+    data: {
+      alert: message,
+      badge: "Increment",
+      sound: "push-notification.aiff"
+    }
+  }, function(error) {
+    console.log("there was an error sending the push: " + error.code + " " + error.message);
+  });
 }
 
 function pushMention(activity, response) {
