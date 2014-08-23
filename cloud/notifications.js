@@ -54,10 +54,14 @@ function pushFollow(activity, response) {
       badge: "Increment",
       sound: "push-notification.aiff"
     }
-    recordNotificationForActivity(activity);
-  }, function(error) {
-    console.log("there was an error sending the push: " + error.code + " " + error.message);
-  });
+  }, {
+    success: function() {
+      recordNotificationForActivity(activity);
+    },
+    error: function(error) {
+      console.log("there was an error sending the push: " + error.code + " " + error.message);
+    }
+  }
 }
 
 
@@ -79,10 +83,14 @@ function pushLike(activity, response) {
       badge: "Increment",
       sound: "push-notification.aiff"
     }
-    recordNotificationForActivity(activity);
-  }, function(error) {
-    console.log("there was an error sending the push: " + error.code + " " + error.message);
-  });
+  }, {
+    success: function() {
+      recordNotificationForActivity(activity);
+    },
+    error: function(error) {
+      console.log("there was an error sending the push: " + error.code + " " + error.message);
+    }
+  }
 }
 
 function pushMention(activity, response) {
@@ -102,10 +110,14 @@ function pushMention(activity, response) {
       badge: "Increment",
       sound: "push-notification.aiff"
     }
-    recordNotificationForActivity(activity);
-  }, function(error) {
-    console.log("there was an error sending the push: " + error.code + " " + error.message);
-  });
+  }, {
+    success: function() {
+      recordNotificationForActivity(activity);
+    },
+    error: function(error) {
+      console.log("there was an error sending the push: " + error.code + " " + error.message);
+    }
+  }
 }
 
 function recordNotificationForActivity(activity) {
