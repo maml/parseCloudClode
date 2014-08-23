@@ -2,38 +2,38 @@ var mentioner, mentionee, blurb;
 
 exports.notify = function(request, response) {
   if (request.object.get("type") == "mention") {
-    getActivity(request).then(function(activity){
-      return getNotificationForActivity(activity);
-    }).then(function(result, activity){
-      if (result) {
-        // there is already a notification for this activity so we do not need to send one
+    getNotificationForActivity(request).then(function(result){
+      if (!result) {
+        return getActivity(request);
       } else {
-        pushMention(activity, response);
+        return;
       }
+    }).then(function(activity) {
+      pushMention(activity);
     });
   }
 
   if (request.object.get("type") == "like") {
-    getActivity(request).then(function(activity){
-      return getNotificationForActivity(activity);
-    }).then(function(result, activity){
-      if (result) {
-        // there is already a notification for this activity so we do not need to send one
+    getNotificationForActivity(request).then(function(result){
+      if (!result) {
+        return getActivity(request);
       } else {
-        pushMention(activity, response);
+        return;
       }
+    }).then(function(activity) {
+      pushLike(activity);
     });
   }
 
   if (request.object.get("type") == "follow") {
-    getActivity(request).then(function(activity){
-      return getNotificationForActivity(activity);
-    }).then(function(result, activity){
-      if (result) {
-        // there is already a notification for this activity so we do not need to send one
+    getNotificationForActivity(request).then(function(result){
+      if (!result) {
+        return getActivity(request);
       } else {
-        pushMention(activity, response);
+        return;
       }
+    }).then(function(activity) {
+      pushFollow(activity);
     });
   }
 }
@@ -68,10 +68,10 @@ function getNotificationForActivity(activity) {
 
   query.first({
     success: function(object) {
-      promise.resolve(object, activity);
+      promise.resolve(object);
     },
     error: function(error) {
-      promise.resolve(null, activity);
+      promise.resolve(null);
     }
   });
 }
