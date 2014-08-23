@@ -3,19 +3,37 @@ var mentioner, mentionee, blurb;
 exports.notify = function(request, response) {
   if (request.object.get("type") == "mention") {
     getActivity(request).then(function(activity){
-      pushMention(activity, response);
+      return getNotificationForActivity(activity);
+    }).then(function(result){
+      if (result) {
+        // there is already a notification for this activity so we do not need to send one
+      } else {
+        pushMention(activity, response);
+      }
     });
   }
 
   if (request.object.get("type") == "like") {
     getActivity(request).then(function(activity){
-      pushLike(activity, response);
+      return getNotificationForActivity(activity);
+    }).then(function(result){
+      if (result) {
+        // there is already a notification for this activity so we do not need to send one
+      } else {
+        pushMention(activity, response);
+      }
     });
   }
 
   if (request.object.get("type") == "follow") {
     getActivity(request).then(function(activity){
-      pushFollow(activity, response);
+      return getNotificationForActivity(activity);
+    }).then(function(result){
+      if (result) {
+        // there is already a notification for this activity so we do not need to send one
+      } else {
+        pushMention(activity, response);
+      }
     });
   }
 }
@@ -35,6 +53,27 @@ function getActivity(request) {
   });
   return promise;
 
+}
+
+function getNotificationForActivity(activity) {
+
+  var promise = new Parse.Promise();
+  var Notification = Parse.Object.extend("Notification");
+
+  var query = new Parse.Query(Notification);
+  query.equalTo("fromUser", activity.get("fromUser"));
+  query.equalTo("toUser", activity.get("toUser"));
+  query.equalTo("type", activity.get("type"));
+  query.equalTo("blurb", activity.get("blurb"));
+
+  query.first({
+    success: function(object) {
+      promise.resolve(object);
+    },
+    error: function(error) {
+      promise.resolve(null);
+    }
+  });
 }
 
 function pushFollow(activity, response) {
