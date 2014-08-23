@@ -4,7 +4,7 @@ exports.notify = function(request, response) {
   if (request.object.get("type") == "mention") {
     getActivity(request).then(function(activity){
       return getNotificationForActivity(activity);
-    }).then(function(result){
+    }).then(function(result, activity){
       if (result) {
         // there is already a notification for this activity so we do not need to send one
       } else {
@@ -16,7 +16,7 @@ exports.notify = function(request, response) {
   if (request.object.get("type") == "like") {
     getActivity(request).then(function(activity){
       return getNotificationForActivity(activity);
-    }).then(function(result){
+    }).then(function(result, activity){
       if (result) {
         // there is already a notification for this activity so we do not need to send one
       } else {
@@ -28,7 +28,7 @@ exports.notify = function(request, response) {
   if (request.object.get("type") == "follow") {
     getActivity(request).then(function(activity){
       return getNotificationForActivity(activity);
-    }).then(function(result){
+    }).then(function(result, activity){
       if (result) {
         // there is already a notification for this activity so we do not need to send one
       } else {
@@ -68,10 +68,10 @@ function getNotificationForActivity(activity) {
 
   query.first({
     success: function(object) {
-      promise.resolve(object);
+      promise.resolve(object, activity);
     },
     error: function(error) {
-      promise.resolve(null);
+      promise.resolve(null, activity);
     }
   });
 }
