@@ -38,7 +38,7 @@ function pushLike(activity, response) {
 
   var message = "@" + liker.get("username") + " liked your blurb, " + blurb.get("title");
 
-  var query = new Parse.query(Parse.Installation);
+  var query = new Parse.Query(Parse.Installation);
   query.equalTo("user", likee);
 
   Parse.Push.send({
