@@ -121,20 +121,18 @@ function pushMention(activity, response) {
 }
 
 function recordNotificationForActivity(activity) {
-    var Notification = Parse.Object.extend("Notification");
-    var notification = new Notification();
-    notification.set("type", activity.get("type"));
-    notification.set("fromUser", activity.get("fromUser"));
-    notification.set("toUser", activity.get("toUser"));
-    notification.set("blurb", activity.get("blurb"));
-    notification.save(null, {
-      success: function(activity) {
-        console.log("Notification has been created with objectId: " + notification.id);
-      },
-      error: function(activity, error) {
-        console.log("Failed to create new activity, with error: " + error.message);
-      }
-    });
-  }
-
+  var Notification = Parse.Object.extend("Notification");
+  var notification = new Notification();
+  notification.set("type", activity.get("type"));
+  notification.set("fromUser", activity.get("fromUser"));
+  notification.set("toUser", activity.get("toUser"));
+  notification.set("blurb", activity.get("blurb"));
+  notification.save(null, {
+    success: function(activity) {
+      console.log("Notification has been created with objectId: " + notification.id);
+    },
+    error: function(activity, error) {
+      console.log("Failed to create new activity, with error: " + error.message);
+    }
+  });
 }
