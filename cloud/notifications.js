@@ -61,7 +61,7 @@ function pushFollow(activity, response) {
     error: function(error) {
       console.log("there was an error sending the push: " + error.code + " " + error.message);
     }
-  }
+  });
 }
 
 
@@ -90,7 +90,7 @@ function pushLike(activity, response) {
     error: function(error) {
       console.log("there was an error sending the push: " + error.code + " " + error.message);
     }
-  }
+  });
 }
 
 function pushMention(activity, response) {
@@ -117,7 +117,7 @@ function pushMention(activity, response) {
     error: function(error) {
       console.log("there was an error sending the push: " + error.code + " " + error.message);
     }
-  }
+  });
 }
 
 function recordNotificationForActivity(activity) {
