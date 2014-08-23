@@ -12,6 +12,12 @@ exports.notify = function(request, response) {
       pushLike(activity, response);
     });
   }
+
+  if (request.object.get("type") == "follow") {
+    getActivity(request).then(function(activity){
+      pushFollow(activity, response);
+    });
+  }
 }
 
 function getActivity(request) {
@@ -30,6 +36,29 @@ function getActivity(request) {
   return promise;
 
 }
+
+function pushFollow(activity, response) {
+
+  follower = activity.get("fromUser");
+  followee = activity.get("toUser");
+
+  var message = "@" + follower.get("username") + " started following you."
+
+  var query = new Parse.Query(Parse.Installation);
+  query.equalTo('user', followee);
+
+  Parse.Push.send({
+    where: query,
+    data: {
+      alert: message,
+      badge: "Increment",
+      sound: "push-notification.aiff"
+    }
+  }, function(error) {
+    console.log("there was an error sending the push: " + error.code + " " + error.message);
+  });
+}
+
 
 function pushLike(activity, response) {
 
