@@ -2,6 +2,7 @@ var mentioner, mentionee, blurb;
 
 exports.notify = function(request, response) {
   if (request.object.get("type") == "mention") {
+    /*
     getNotificationForRequest(request).then(function(result){
       if (!result) {
         return getActivity(request);
@@ -11,29 +12,30 @@ exports.notify = function(request, response) {
     }).then(function(activity) {
       pushMention(activity);
     });
-  }
-
-  if (request.object.get("type") == "like") {
-    getNotificationForRequest(request).then(function(result){
-      if (!result) {
-        return getActivity(request);
-      } else {
-        return;
-      }
-    }).then(function(activity) {
-      pushLike(activity);
-    });
+    */
   }
 
   if (request.object.get("type") == "follow") {
-    getNotificationForRequest(request).then(function(result){
-      if (!result) {
+    /*
+    getNotificationForRequest(request).then(function(count){
+      if (!count) {
         return getActivity(request);
       } else {
         return;
       }
     }).then(function(activity) {
       pushFollow(activity);
+    });
+    */
+  }
+
+  if (request.object.get("type") == "like") {
+    haveSentNotificationForRequest(request).then(function(haveNotified){
+      if (!haveNotified) {
+        getActivity(request).then(function(activity){
+          pushLike(activity);
+        });
+      }
     });
   }
 }
@@ -55,7 +57,7 @@ function getActivity(request) {
 
 }
 
-function getNotificationForRequest(request) {
+function haveSentNotificationForRequest(request) {
 
   var promise = new Parse.Promise();
   var Notification = Parse.Object.extend("Notification");
@@ -66,12 +68,18 @@ function getNotificationForRequest(request) {
   query.equalTo("type", request.object.get("type"));
   query.equalTo("blurb", request.object.get("blurb"));
 
-  query.first({
-    success: function(object) {
-      promise.resolve(object);
+  query.count({
+    success: function(count) {
+      haveNotified;
+      if (count > 0) {
+        haveNotified = true;
+      } else {
+        haveNotified = false;
+      }
+      promise.resolve(haveNotified);
     },
     error: function(error) {
-      promise.resolve(null);
+      return Parse.Promise.error("There was an error counting the number of Notifications matching the query");
     }
   });
 }
