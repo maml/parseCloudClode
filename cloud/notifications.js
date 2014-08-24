@@ -1,44 +1,34 @@
-var mentioner, mentionee, blurb;
+/*
+  This method is called on afterSave of an Activity. We first get the activity that was just saved.
+  Then, we look to see if there's a notification in the database for this activity. If there is that
+  means a notification has already been pushed for this activity and we do nothing. If there is not
+  that means we haven not yet sent a push notification so we create a notification for the activity. If
+  the notification successfully saves, then a push notification is sent.
+
+  The Notification class exists as a way to determine wether or not a particular activity has had a push
+  notification sent out for it and to send a push notification for a given activity, if needed.
+*/
 
 exports.notify = function(request, response) {
-  if (request.object.get("type") == "mention") {
-    /*
-    getNotificationForRequest(request).then(function(result){
-      if (!result) {
-        return getActivity(request);
-      } else {
-        return;
-      }
-    }).then(function(activity) {
-      pushMention(activity);
-    });
-    */
-  }
 
-  if (request.object.get("type") == "follow") {
-    /*
-    getNotificationForRequest(request).then(function(count){
-      if (!count) {
-        return getActivity(request);
-      } else {
-        return;
-      }
-    }).then(function(activity) {
-      pushFollow(activity);
-    });
-    */
-  }
+  var returnedActivity;
 
-  if (request.object.get("type") == "like") {
-    haveSentNotificationForRequest(request).then(function(haveNotified){
-      if (!haveNotified) {
-        getActivity(request).then(function(activity){
-          pushLike(activity);
-        });
-      }
-    });
-  }
+  getActivity(request).then(function(activity){
+    returnedActivity = activity;
+    return getNotification(activity);
+  }).then(function(notification){
+    if (notification === undefined) {
+      recordNotificationForActivity(returnedActivity);
+    }
+  }, function(error){
+    console.log(error.code + " " + error.message);
+  });
+
 }
+
+/*
+  A promise that gets an instance of an Activity from a request object
+*/
 
 function getActivity(request) {
 
@@ -57,115 +47,31 @@ function getActivity(request) {
 
 }
 
-function haveSentNotificationForRequest(request) {
+/*
+  A promise that gets the first notification for a given activity.
+*/
 
+function getNotification(activity)
+{
   var promise = new Parse.Promise();
   var Notification = Parse.Object.extend("Notification");
 
   var query = new Parse.Query(Notification);
-  query.equalTo("fromUser", request.object.get("fromUser"));
-  query.equalTo("toUser", request.object.get("toUser"));
-  query.equalTo("type", request.object.get("type"));
-  query.equalTo("blurb", request.object.get("blurb"));
+  query.equalTo("fromUser", activity.get("fromUser"));
+  query.equalTo("toUser", activity.get("toUser"));
+  query.equalTo("blurb", activity.get("blurb"))
+  query.equalTo("type", activity.get("type"));
 
-  query.count({
-    success: function(count) {
-      haveNotified;
-      if (count > 0) {
-        haveNotified = true;
-      } else {
-        haveNotified = false;
-      }
-      promise.resolve(haveNotified);
-    },
-    error: function(error) {
-      return Parse.Promise.error("There was an error counting the number of Notifications matching the query");
-    }
+  query.first().then(function(notification){
+    promise.resolve(notification);
   });
+  return promise;
 }
 
-function pushFollow(activity, response) {
-
-  follower = activity.get("fromUser");
-  followee = activity.get("toUser");
-
-  var message = "@" + follower.get("username") + " started following you."
-
-  var query = new Parse.Query(Parse.Installation);
-  query.equalTo('user', followee);
-
-  Parse.Push.send({
-    where: query,
-    data: {
-      alert: message,
-      badge: "Increment",
-      sound: "push-notification.aiff"
-    }
-  }, {
-    success: function() {
-      recordNotificationForActivity(activity);
-    },
-    error: function(error) {
-      console.log("there was an error sending the push: " + error.code + " " + error.message);
-    }
-  });
-}
-
-
-function pushLike(activity, response) {
-
-  liker = activity.get("fromUser");
-  likee = activity.get("toUser");
-  blurb = activity.get("blurb");
-
-  var message = "@" + liker.get("username") + " liked your blurb, " + blurb.get("title");
-
-  var query = new Parse.Query(Parse.Installation);
-  query.equalTo("user", likee);
-
-  Parse.Push.send({
-    where: query,
-    data: {
-      alert: message,
-      badge: "Increment",
-      sound: "push-notification.aiff"
-    }
-  }, {
-    success: function() {
-      recordNotificationForActivity(activity);
-    },
-    error: function(error) {
-      console.log("there was an error sending the push: " + error.code + " " + error.message);
-    }
-  });
-}
-
-function pushMention(activity, response) {
-
-  mentioner = activity.get("fromUser");
-  mentionee = activity.get("toUser");
-
-  var message = "@" + mentioner.get("username") + " mentioned you in a blurb."
-
-  var query = new Parse.Query(Parse.Installation);
-  query.equalTo('user', mentionee);
-
-  Parse.Push.send({
-    where: query,
-    data: {
-      alert: message,
-      badge: "Increment",
-      sound: "push-notification.aiff"
-    }
-  }, {
-    success: function() {
-      recordNotificationForActivity(activity);
-    },
-    error: function(error) {
-      console.log("there was an error sending the push: " + error.code + " " + error.message);
-    }
-  });
-}
+/*
+  Creates an instance of a Notification for a given activity. If successfull it will make
+  a call to send a push notification.
+*/
 
 function recordNotificationForActivity(activity) {
   var Notification = Parse.Object.extend("Notification");
@@ -177,9 +83,74 @@ function recordNotificationForActivity(activity) {
   notification.save(null, {
     success: function(activity) {
       console.log("Notification has been created with objectId: " + notification.id);
+      (activity.get("type") == "like") ? pushLike(activity) : null;
+      (activity.get("type") == "follow") ? pushFollow(activity) : null;
+      (activity.get("type") == "mention") ? pushMention(activity) : null;
     },
     error: function(activity, error) {
       console.log("Failed to create new activity, with error: " + error.message);
     }
   });
+}
+
+/*
+  Push methods
+*/
+
+function push(query, message) {
+  Parse.Push.send({
+    where: query,
+    data: {
+      alert: message,
+      badge: "Increment",
+      sound: "push-notification.aiff"
+    }
+  });
+}
+
+function pushFollow(activity) {
+  var message = messageForFollow(activity);
+  var query = queryForPush(activity);
+  push(query, message);
+}
+
+function pushLike(activity) {
+  var message = messageForLike(activity);
+  var query = queryForPush(activity);
+  push(query, message);
+}
+
+function pushMention(activity) {
+  var message = messageForMention(activity);
+  var query = queryForPush(activity);
+  push(query, message);
+}
+
+/*
+  Query for Push Notification
+*/
+
+function queryForPush(activity) {
+  var query = new Parse.Query(Parse.Installation);
+  query.equalTo("user", activity.get("toUser"));
+  return query;
+}
+
+/*
+  Messages for Push Notification
+*/
+
+function messageForFollow(activity) {
+  var message = "@" + activity.get("fromUser").get("username") + " started following you.";
+  return message;
+}
+
+function messageForLike(activity) {
+  var message = "@" + activity.get("fromUser").get("username") + " liked your blurb, " + activity.get("blurb").get("title");
+  return message;
+}
+
+function messageForMention(activity) {
+  var message = "@" + activity.get("fromUser").get("username") + " mentioned you in a blurb.";
+  return message;
 }
