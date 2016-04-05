@@ -1,7 +1,7 @@
 {
     "applications": {
         "_default": {
-            "link": "tincan"
+            "link": "tincan-dev"
         },
         "tincan-dev": {
           "applicationId": "YVC4Kkv6qocPtoT27RY8hJmONMhGhJW19f1q09OE",
