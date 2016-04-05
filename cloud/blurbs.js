@@ -1,6 +1,40 @@
 var mentioner;
 var activities = require('cloud/activities.js');
 
+exports.incrementLikeCount = function(request, response) {
+  if (request.object.get("type") == "like") {
+    query = new Parse.Query("AudioClip");
+    query.get(request.object.get("blurb").id, {
+      success: function(blurb) {
+        blurb.increment("likeCount");
+        blurb.save();
+      },
+      error: function(error) {
+        console.log("Got an error " + error.code + " : " + error.message);
+      }
+    });
+  } else {
+    return;
+  }
+}
+
+exports.decrementLikeCount = function(request, response) {
+  if (request.object.get("type") == "like") {
+    query = new Parse.Query("AudioClip");
+    query.get(request.object.get("blurb").id, {
+      success: function(blurb) {
+        blurb.increment("likeCount", -1);
+        blurb.save();
+      },
+      error: function(error) {
+        console.log("Got an error " + error.code + " : " + error.message);
+      }
+    })
+  } else {
+    return;
+  }
+}
+
 exports.extractMentions = function(request, response) {
 
   blurb = request.object;

@@ -29,6 +29,11 @@ Parse.Cloud.afterSave("AudioClip", function(request, response) {
   Activities
 */
 var notifications = require('cloud/notifications.js');
+var audioClips = require('cloud/blurbs.js');
 Parse.Cloud.afterSave("Activity", function(request, response) {
   notifications.notify(request, response);
+  audioClips.incrementLikeCount(request, response);
 });
+Parse.Cloud.afterDelete("Activity", function(request, response) {
+  audioClips.decrementLikeCount(request, response);
+})
