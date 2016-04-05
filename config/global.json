@@ -2,12 +2,20 @@
     "applications": {
         "_default": {
             "link": "tincan"
-        }, 
+        },
+        "tincan-dev": {
+          "applicationId": "YVC4Kkv6qocPtoT27RY8hJmONMhGhJW19f1q09OE",
+          "masterKey": "6F1Ey9CLONWtOvTBKb7uP0zzpjjKEoiprlCEU03K"
+        },
+        "tincan-staging": {
+          "applicationId": "z7oDkK0K8CDZPdf5eAtSWfVOWmULkC0cHBWgg0Ic",
+          "masterKey": "fI6kd4epKmfSdwGq9s0Gp12F5pZmquOUbCsKrD8v"
+        },
         "tincan": {
-            "applicationId": "ElWN0AtEhVHuu3DUqbmRwgnO7DlAglh0JMYeGXcS", 
+            "applicationId": "ElWN0AtEhVHuu3DUqbmRwgnO7DlAglh0JMYeGXcS",
             "masterKey": "Eeng0rSrjxcXqNtAFL6APlue1LQKgGhPf75lRWjX"
         }
-    }, 
+    },
     "global": {
         "parseVersion": "1.2.18"
     }
